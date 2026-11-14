@@ -2,7 +2,7 @@
 
 终端极客风格的个人站点，Astro 构建，托管 GitHub Pages。含独立「资源分享」分区与本地管理后台。
 
-- 线上地址（部署后）：https://yidonghu.github.io
+- 线上地址：https://yidonghu.github.io（已部署，Push 后约 40 秒更新）
 - 本地预览：`npm run dev` → http://localhost:4321
 - 本地后台：`npm run admin` → http://127.0.0.1:7788
 
