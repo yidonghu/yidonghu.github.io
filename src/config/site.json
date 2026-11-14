@@ -7,10 +7,22 @@
   "bilibili": "https://space.bilibili.com/702195792",
   "since": "2026",
   "nav": [
-    { "label": "./posts", "href": "/posts" },
-    { "label": "./archive", "href": "/archive" },
-    { "label": "./resources", "href": "/resources" },
-    { "label": "./about", "href": "/about" }
+    {
+      "label": "./posts",
+      "href": "/posts"
+    },
+    {
+      "label": "./archive",
+      "href": "/archive"
+    },
+    {
+      "label": "./resources",
+      "href": "/resources"
+    },
+    {
+      "label": "./about",
+      "href": "/about"
+    }
   ],
   "layout": {
     "defaultTheme": "dark",
@@ -22,7 +34,12 @@
     "listStyle": "rows",
     "tocPosition": "right",
     "excerptLines": 3,
-    "showGrid": true,
-    "homeModules": ["intro", "latest", "resources", "tags"]
+    "showGrid": false,
+    "homeModules": [
+      "intro",
+      "latest",
+      "resources",
+      "tags"
+    ]
   }
 }
