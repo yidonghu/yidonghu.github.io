@@ -403,6 +403,7 @@ function resFields(data) {
       <div class="field"><label>体积</label><input type="text" name="size" value="${esc(data.size || '')}" /></div>
     </div>
     <div class="field"><label>分享链接</label><input type="text" name="url" value="${esc(data.url || '')}" /></div>
+    <div class="field"><label>GitHub 仓库（可选，资源的源码仓库地址）</label><input type="text" name="repo" value="${esc(data.repo || '')}" placeholder="https://github.com/用户名/仓库名" /></div>
     <div class="row">
       <div class="field"><label>提取码</label><input type="text" name="code" value="${esc(data.code || '')}" /></div>
       <div class="field"><label>更新时间</label><input type="date" name="updated" value="${esc(String(data.updated || '').slice(0, 10))}" /></div>
@@ -440,6 +441,7 @@ function openResource(slug) {
         title: get('title').value.trim(),
         platform: get('platform').value,
         url: get('url').value.trim(),
+        repo: get('repo').value.trim(),
         code: get('code').value.trim(),
         size: get('size').value.trim(),
         updated: get('updated').value || new Date().toISOString().slice(0, 10),

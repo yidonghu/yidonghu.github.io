@@ -82,6 +82,7 @@ pinned: false
 title: "资源名称"
 platform: baidu          # baidu / quark / aliyun / lanzou / github
 url: "https://pan.baidu.com/s/xxxx"
+repo: "https://github.com/xxx/yyy"   # 可选：资源的源码仓库，卡片上会多一个「GitHub 仓库」按钮
 code: "8x2k"            # 没有提取码就留空
 size: "4.7 MB"
 updated: 2026-11-12
@@ -92,6 +93,8 @@ summary: "一句话说明"
 
 使用说明（Markdown，可留空）。
 ```
+
+`repo` 可以不填；填了之后资源卡和详情页都会出现「GitHub 仓库」按钮，网盘链接与仓库地址互不影响。
 
 - `status: dead` 的卡片会变灰但仍保留，方便回头补链接；
 - 卡片上「报告失效」按钮会打开预填模板的 GitHub Issue。
@@ -124,7 +127,7 @@ npm run admin
 浏览器打开 http://127.0.0.1:7788，四个模块：
 
 - **文章**：新建 / 编辑 / 删除，Markdown 编辑 + 预览，草稿与置顶开关
-- **资源**：网盘类型、链接、提取码、状态可视化增删改
+- **资源**：网盘类型、链接、提取码、GitHub 仓库、状态可视化增删改
 - **站点设置**：站名、社交链接、列表样式、主题色等，改动直接写回 `site.json`
 - **发布**：查看 git 状态 → 一键 commit + push（附构建状态说明）
 

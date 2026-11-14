@@ -48,6 +48,9 @@ const reportUrl = `https://github.com/yidonghu/yidonghu.github.io/issues/new?tit
         提取码 {data.code}
       </button>
     )}
+    {data.repo && (
+      <a class="btn" href={data.repo} target="_blank" rel="noopener" title="打开该资源的源码仓库">GitHub 仓库</a>
+    )}
     <a class="btn btn-ghost" href={`/resources/${slug}/`}>详情</a>
     <a class="btn btn-ghost" href={reportUrl} target="_blank" rel="noopener">报告失效</a>
   </div>

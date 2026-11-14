@@ -2,6 +2,7 @@
 title: "本站同款 Astro 博客模板"
 platform: github
 url: "https://github.com/yidonghu/yidonghu.github.io"
+repo: "https://github.com/yidonghu/yidonghu.github.io"
 size: "约 1.2 MB"
 updated: 2026-11-14
 tags: ["Astro", "模板", "源码"]

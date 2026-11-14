@@ -48,6 +48,9 @@ const reportUrl = `${site.github}/yidonghu.github.io/issues/new?title=${encodeUR
           </button>
         )}
         <a class="btn btn-ghost" href={data.url} target="_blank" rel="noopener">打开链接</a>
+        {data.repo && (
+          <a class="btn btn-ghost" href={data.repo} target="_blank" rel="noopener">GitHub 仓库</a>
+        )}
         <a class="btn btn-ghost" href={reportUrl} target="_blank" rel="noopener">报告失效</a>
       </div>
 
