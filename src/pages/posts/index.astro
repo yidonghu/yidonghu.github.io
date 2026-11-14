@@ -10,9 +10,9 @@ const tags = allTags(posts);
 ---
 <BaseLayout title="文章" description={`${site.title} 的全部文章`}>
   <div class="section-head" style="margin-top:0">
-    <span class="label">$ ls ./posts --sort=date</span>
+    <span class="label">$ 列出 文章 --按时间</span>
     <span class="line"></span>
-    <span class="more">{posts.length} items</span>
+    <span class="more">{posts.length} 篇</span>
   </div>
 
   <div class="search-box">
@@ -20,7 +20,7 @@ const tags = allTags(posts);
     <input
       id="post-search"
       type="search"
-      placeholder="grep 标题 / 标签 / 摘要…"
+      placeholder="搜索标题 / 标签 / 摘要…"
       autocomplete="off"
       spellcheck="false"
       aria-label="搜索文章"
@@ -39,7 +39,7 @@ const tags = allTags(posts);
   {tags.length > 0 && (
     <section>
       <div class="section-head">
-        <span class="label">$ ls ./tags</span>
+        <span class="label">$ 列出 标签</span>
         <span class="line"></span>
       </div>
       <div class="tag-cloud">

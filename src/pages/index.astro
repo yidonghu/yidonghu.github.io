@@ -20,25 +20,25 @@ const modules = site.layout.homeModules;
         <section class="term">
           <div class="term-bar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="term-title">~/welcome — zsh</span>
+            <span class="term-title">~ 首页</span>
           </div>
           <div class="term-body">
-            <p class="cmd"><span class="prompt">$</span>whoami</p>
+            <p class="cmd"><span class="prompt">$</span>我是谁</p>
             <p class="out"><strong>{site.title}</strong> —— {site.tagline}。这里放长一点的技术笔记，也放一些剪视频时顺手整理的资料。</p>
 
-            <p class="cmd"><span class="prompt">$</span>cat links.txt</p>
+            <p class="cmd"><span class="prompt">$</span>联系方式</p>
             <p class="out">
-              <span class="hl">github</span> {site.github.replace('https://', '')} ·
-              <span class="hl">bilibili</span> {site.bilibili.replace('https://', '')} ·
-              <span class="hl">mail</span> {site.email}
+              <span class="hl">GitHub</span> {site.github.replace('https://', '')} ·
+              <span class="hl">B站</span> {site.bilibili.replace('https://', '')} ·
+              <span class="hl">邮箱</span> {site.email}
             </p>
 
-            <p class="cmd"><span class="prompt">$</span>ls ./stats</p>
+            <p class="cmd"><span class="prompt">$</span>站点统计</p>
             <p class="out">
-              posts <span class="hl">{posts.length}</span>
-              &nbsp;·&nbsp; resources <span class="hl">{resources.length}</span>
-              &nbsp;·&nbsp; tags <span class="hl">{tags.length}</span>
-              &nbsp;·&nbsp; since <span class="hl">{site.since}</span>
+              文章 <span class="hl">{posts.length}</span>
+              &nbsp;·&nbsp; 资源 <span class="hl">{resources.length}</span>
+              &nbsp;·&nbsp; 标签 <span class="hl">{tags.length}</span>
+              &nbsp;·&nbsp; 始于 <span class="hl">{site.since}</span>
             </p>
             <p class="cmd"><span class="prompt">$</span><span class="cursor" style="color:inherit">▌</span></p>
           </div>
@@ -48,7 +48,7 @@ const modules = site.layout.homeModules;
       {mod === 'latest' && (
         <section>
           <div class="section-head">
-            <span class="label">$ ls ./posts --sort=date</span>
+            <span class="label">$ 列出 文章 --按时间</span>
             <span class="line"></span>
             <a class="more" href="/posts">全部 →</a>
           </div>
@@ -65,7 +65,7 @@ const modules = site.layout.homeModules;
       {mod === 'resources' && (
         <section>
           <div class="section-head">
-            <span class="label">$ ls ./resources</span>
+            <span class="label">$ 列出 资源</span>
             <span class="line"></span>
             <a class="more" href="/resources">全部 →</a>
           </div>
@@ -82,7 +82,7 @@ const modules = site.layout.homeModules;
       {mod === 'tags' && (
         <section>
           <div class="section-head">
-            <span class="label">$ ls ./tags</span>
+            <span class="label">$ 列出 标签</span>
             <span class="line"></span>
             <a class="more" href="/tags">全部 →</a>
           </div>

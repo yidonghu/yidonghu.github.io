@@ -18,7 +18,7 @@ const showToc = site.layout.tocPosition !== 'hidden' && post.headings.length > 0
 ---
 <BaseLayout title={post.data.title} description={post.data.description} kind="article">
   <div class="breadcrumb">
-    <a href="/posts">~/posts</a> / <span>{post.slug}.md</span>
+    <a href="/posts">~/文章</a> / <span>{post.slug}.md</span>
   </div>
 
   <header class="post-head">
@@ -26,7 +26,7 @@ const showToc = site.layout.tocPosition !== 'hidden' && post.headings.length > 0
     <div class="post-meta">
       <span>{formatDate(post.data.pubDate)}</span>
       <span class="sep">·</span>
-      <span>{post.readingTime} min read</span>
+      <span>约 {post.readingTime} 分钟读完</span>
       {post.data.category && <><span class="sep">·</span><span>{post.data.category}</span></>}
       {tags.length > 0 && <><span class="sep">·</span>{tags.map((t) => <TagPill tag={t} />)}</>}
     </div>
@@ -39,7 +39,7 @@ const showToc = site.layout.tocPosition !== 'hidden' && post.headings.length > 0
 
     {showToc && (
       <aside class="toc" aria-label="目录">
-        <div class="toc-title"># index</div>
+        <div class="toc-title"># 目录</div>
         <ul>
           {post.headings
             .filter((h) => h.depth <= 3)

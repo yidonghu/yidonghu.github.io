@@ -4,19 +4,19 @@ import { site } from '../config/site';
 ---
 <BaseLayout title="关于" description="关于 yidonghu">
   <div class="section-head" style="margin-top:0">
-    <span class="label">$ cat ./about.md</span>
+    <span class="label">$ 关于我</span>
     <span class="line"></span>
   </div>
 
   <div class="term" style="margin-bottom:2.5rem">
     <div class="term-bar">
       <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      <span class="term-title">~/about — zsh</span>
+      <span class="term-title">~ 关于</span>
     </div>
     <div class="term-body">
-      <p class="cmd"><span class="prompt">$</span>whoami</p>
+      <p class="cmd"><span class="prompt">$</span>我是谁</p>
       <p class="out"><strong>{site.title}</strong> —— {site.tagline}。</p>
-      <p class="cmd"><span class="prompt">$</span>ls ./interests</p>
+      <p class="cmd"><span class="prompt">$</span>兴趣</p>
       <p class="out">代码 / 视频剪辑 / 折腾设备 / 偶尔写点长文记录踩过的坑</p>
     </div>
   </div>
@@ -33,9 +33,9 @@ import { site } from '../config/site';
   </article>
 
   <div class="about-links" style="max-width:44rem">
-    <a href={site.bilibili} target="_blank" rel="me noopener"><span class="k">bilibili</span>{site.bilibili}</a>
-    <a href={site.github} target="_blank" rel="me noopener"><span class="k">github</span>{site.github}</a>
-    <a href={`mailto:${site.email}`}><span class="k">email</span>{site.email}</a>
-    <a href="/rss.xml"><span class="k">rss</span>/rss.xml</a>
+    <a href={site.bilibili} target="_blank" rel="me noopener"><span class="k">B站</span>{site.bilibili}</a>
+    <a href={site.github} target="_blank" rel="me noopener"><span class="k">GitHub</span>{site.github}</a>
+    <a href={`mailto:${site.email}`}><span class="k">邮箱</span>{site.email}</a>
+    <a href="/rss.xml"><span class="k">RSS</span>/rss.xml</a>
   </div>
 </BaseLayout>

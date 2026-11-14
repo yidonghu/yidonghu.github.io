@@ -8,19 +8,19 @@
   "since": "2026",
   "nav": [
     {
-      "label": "./posts",
+      "label": "./文章",
       "href": "/posts"
     },
     {
-      "label": "./archive",
+      "label": "./归档",
       "href": "/archive"
     },
     {
-      "label": "./resources",
+      "label": "./资源",
       "href": "/resources"
     },
     {
-      "label": "./about",
+      "label": "./关于",
       "href": "/about"
     }
   ],

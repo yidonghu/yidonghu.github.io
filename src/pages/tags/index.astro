@@ -8,9 +8,9 @@ const tags = allTags(posts);
 ---
 <BaseLayout title="标签" description="按标签浏览文章">
   <div class="section-head" style="margin-top:0">
-    <span class="label">$ ls ./tags</span>
+    <span class="label">$ 列出 标签</span>
     <span class="line"></span>
-    <span class="more">{tags.length} tags</span>
+    <span class="more">{tags.length} 个</span>
   </div>
   <div class="tag-cloud">
     {tags.map((t) => <TagPill tag={t.tag} count={t.count} />)}

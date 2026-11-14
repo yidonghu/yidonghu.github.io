@@ -57,7 +57,7 @@ const reportUrl = `${site.github}/yidonghu.github.io/issues/new?title=${encodeUR
         ) : (
           <p>{data.summary}</p>
         )}
-        {tags.length > 0 && <p class="mute" style="font-family:var(--mono);font-size:12px">tags: {tags.map((t) => `#${t}`).join(' ')}</p>}
+        {tags.length > 0 && <p class="mute" style="font-family:var(--mono);font-size:12px">标签：{tags.map((t) => `#${t}`).join(' ')}</p>}
       </article>
     </div>
   </div>

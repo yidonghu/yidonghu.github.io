@@ -15,14 +15,14 @@ const years = [...groups.entries()].sort((a, b) => b[0].localeCompare(a[0]));
 ---
 <BaseLayout title="归档" description="按年份浏览全部文章">
   <div class="section-head" style="margin-top:0">
-    <span class="label">$ find ./posts -type f | sort</span>
+    <span class="label">$ 列出 文章 --按年份</span>
     <span class="line"></span>
-    <span class="more">{posts.length} posts</span>
+    <span class="more">{posts.length} 篇</span>
   </div>
 
   {years.map(([year, items]) => (
     <section class="year-block">
-      <div class="year-title">{year} — {items.length} posts</div>
+      <div class="year-title">{year} 年 — {items.length} 篇</div>
       <div class:list={[site.layout.listStyle === 'cards' ? 'post-cards' : 'post-rows']} style="border-top:0">
         {items.map((p) => <PostCard slug={p.slug} data={p.data} />)}
       </div>
