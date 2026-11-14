@@ -10,7 +10,11 @@ status: ok
 summary: "本站用的就是这份代码：终端风格主题、资源分区、本地管理后台，克隆下来改配置就能用。"
 ---
 
-直接克隆仓库，删掉 `src/content/` 下的示例文章，改 `src/config/site.json` 里的站点信息即可。
+## 包含内容
+
+本站的完整源码：终端风格主题（明暗两套）、独立资源分区（四类网盘筛选 + 链接/提取码分开复制）、本地零依赖管理后台、Windows 一键启动脚本、GitHub Actions 部署流水线。
+
+## 快速开始
 
 ```bash
 git clone https://github.com/yidonghu/yidonghu.github.io
@@ -19,4 +23,12 @@ npm install
 npm run dev
 ```
 
-没有提取码，也没有二次转载限制，注明来源就行。
+## 改成你自己的站
+
+1. 改 `src/config/site.json`：站名、简介、社交链接、布局开关、主题色
+2. 清掉 `src/data/posts/` 与 `src/data/resources/` 里的示例内容
+3. 仓库改名成 `你的用户名.github.io`，`Settings → Pages` 的 Source 选 **GitHub Actions**
+
+## 许可
+
+代码可自由使用，注明来源即可；示例文章与资源条目里的文字请替换成你自己的内容。
