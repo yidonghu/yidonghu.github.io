@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config/site';
+---
+<BaseLayout title="关于" description="关于 yidonghu">
+  <div class="section-head" style="margin-top:0">
+    <span class="label">$ cat ./about.md</span>
+    <span class="line"></span>
+  </div>
+
+  <div class="term" style="margin-bottom:2.5rem">
+    <div class="term-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="term-title">~/about — zsh</span>
+    </div>
+    <div class="term-body">
+      <p class="cmd"><span class="prompt">$</span>whoami</p>
+      <p class="out"><strong>{site.title}</strong> —— {site.tagline}。</p>
+      <p class="cmd"><span class="prompt">$</span>ls ./interests</p>
+      <p class="out">代码 / 视频剪辑 / 折腾设备 / 偶尔写点长文记录踩过的坑</p>
+    </div>
+  </div>
+
+  <article class="prose" style="max-width:44rem">
+    <p>
+      这里是我的个人站点。写技术笔记，也把 B站视频里用到的资料整理成可以直接下载的形式，
+      所以单独开了「资源分享」一栏。所有资源都是我自己整理的，或者公开授权的。
+    </p>
+    <p>
+      站点用 Astro 构建，托管在 GitHub Pages 上，改一行配置就能调布局，
+      发一篇文章只要新增一个 Markdown 文件。
+    </p>
+  </article>
+
+  <div class="about-links" style="max-width:44rem">
+    <a href={site.bilibili} target="_blank" rel="me noopener"><span class="k">bilibili</span>{site.bilibili}</a>
+    <a href={site.github} target="_blank" rel="me noopener"><span class="k">github</span>{site.github}</a>
+    <a href={`mailto:${site.email}`}><span class="k">email</span>{site.email}</a>
+    <a href="/rss.xml"><span class="k">rss</span>/rss.xml</a>
+  </div>
+</BaseLayout>

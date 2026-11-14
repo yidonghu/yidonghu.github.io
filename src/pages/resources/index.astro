@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ResourceCard from '../../components/ResourceCard.astro';
+import { getAllResources } from '../../lib/content';
+
+const resources = getAllResources();
+const platforms = [
+  { key: 'all', label: '全部' },
+  { key: 'baidu', label: '百度网盘' },
+  { key: 'quark', label: '夸克网盘' },
+  { key: 'aliyun', label: '阿里云盘' },
+  { key: 'lanzou', label: '蓝奏 / 123' },
+  { key: 'github', label: 'GitHub' },
+];
+---
+<BaseLayout title="资源分享" description="网盘资源、模板与资料，持续更新。">
+  <div class="section-head" style="margin-top:0">
+    <span class="label">$ ls ./resources</span>
+    <span class="line"></span>
+    <span class="more" id="res-count">{resources.length} items</span>
+  </div>
+
+  <h2 class="block-title">资源分享</h2>
+  <p class="dim" style="margin:0.2rem 0 0; font-size:14px; max-width:44rem">
+    这里只放自制或已获授权的内容：模板、笔记、字体、代码片段。链接失效请点卡片上的「报告失效」。
+  </p>
+
+  <div class="chips" id="platform-chips">
+    {platforms.map((p, i) => (
+      <button class="chip" type="button" data-platform={p.key} data-active={i === 0 ? 'true' : 'false'}>
+        {p.label}
+      </button>
+    ))}
+  </div>
+
+  <div class="chips" style="margin-top:0.45rem">
+    <button class="chip" type="button" id="only-alive" data-active="false">仅显示有效</button>
+    <button class="chip" type="button" id="sort-toggle" data-active="false">按更新时间</button>
+  </div>
+
+  {resources.length ? (
+    <div class="res-grid" id="res-grid">
+      {resources.map((r) => <ResourceCard slug={r.slug} data={r.data} />)}
+    </div>
+  ) : (
+    <p class="empty">// 资源区还空着</p>
+  )}
+
+  <p class="mute" style="margin-top:2.5rem; font-size:12px; font-family:var(--mono); max-width:46rem">
+    免责声明：本站资源仅用于学习交流，均为自制或公开授权内容。如涉及版权问题，请通过邮箱联系，我会在 48 小时内下架。
+  </p>
+
+  <script is:inline>
+    (function () {
+      var grid = document.getElementById('res-grid');
+      if (!grid) return;
+      var cards = Array.prototype.slice.call(grid.children);
+      var count = document.getElementById('res-count');
+      var state = { platform: 'all', alive: false, sorted: false };
+
+      function render() {
+        var shown = 0;
+        cards.forEach(function (card) {
+          var ok = state.platform === 'all' || card.dataset.platform === state.platform;
+          if (state.alive && card.dataset.status !== 'ok') ok = false;
+          card.style.display = ok ? '' : 'none';
+          if (ok) shown++;
+        });
+        if (count) count.textContent = shown + ' / ' + cards.length + ' items';
+      }
+
+      var chips = document.querySelectorAll('#platform-chips .chip');
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          chips.forEach(function (c) { c.dataset.active = 'false'; });
+          chip.dataset.active = 'true';
+          state.platform = chip.dataset.platform;
+          render();
+        });
+      });
+
+      var aliveBtn = document.getElementById('only-alive');
+      if (aliveBtn) aliveBtn.addEventListener('click', function () {
+        state.alive = !state.alive;
+        aliveBtn.dataset.active = state.alive ? 'true' : 'false';
+        render();
+      });
+
+      var sortBtn = document.getElementById('sort-toggle');
+      if (sortBtn) sortBtn.addEventListener('click', function () {
+        state.sorted = !state.sorted;
+        sortBtn.dataset.active = state.sorted ? 'true' : 'false';
+        var sorted = cards.slice().sort(function (a, b) {
+          return a.querySelector('h3').textContent.localeCompare(b.querySelector('h3').textContent, 'zh');
+        });
+        sorted.forEach(function (c) { grid.appendChild(c); });
+      });
+
+      render();
+    })();
+  </script>
+</BaseLayout>

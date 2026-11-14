@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import ResourceCard from '../components/ResourceCard.astro';
+import TagPill from '../components/TagPill.astro';
+import { site } from '../config/site';
+import { getAllPosts, getAllResources, allTags } from '../lib/content';
+
+const posts = getAllPosts();
+const resources = getAllResources();
+const tags = allTags(posts);
+const latest = posts.slice(0, 5);
+const latestResources = resources.slice(0, 3);
+const modules = site.layout.homeModules;
+---
+<BaseLayout>
+  {modules.map((mod) => (
+    <>
+      {mod === 'intro' && (
+        <section class="term">
+          <div class="term-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="term-title">~/welcome — zsh</span>
+          </div>
+          <div class="term-body">
+            <p class="cmd"><span class="prompt">$</span>whoami</p>
+            <p class="out"><strong>{site.title}</strong> —— {site.tagline}。这里放长一点的技术笔记，也放一些剪视频时顺手整理的资料。</p>
+
+            <p class="cmd"><span class="prompt">$</span>cat links.txt</p>
+            <p class="out">
+              <span class="hl">github</span> {site.github.replace('https://', '')} ·
+              <span class="hl">bilibili</span> {site.bilibili.replace('https://', '')} ·
+              <span class="hl">mail</span> {site.email}
+            </p>
+
+            <p class="cmd"><span class="prompt">$</span>ls ./stats</p>
+            <p class="out">
+              posts <span class="hl">{posts.length}</span>
+              &nbsp;·&nbsp; resources <span class="hl">{resources.length}</span>
+              &nbsp;·&nbsp; tags <span class="hl">{tags.length}</span>
+              &nbsp;·&nbsp; since <span class="hl">{site.since}</span>
+            </p>
+            <p class="cmd"><span class="prompt">$</span><span class="cursor" style="color:inherit">▌</span></p>
+          </div>
+        </section>
+      )}
+
+      {mod === 'latest' && (
+        <section>
+          <div class="section-head">
+            <span class="label">$ ls ./posts --sort=date</span>
+            <span class="line"></span>
+            <a class="more" href="/posts">全部 →</a>
+          </div>
+          {latest.length ? (
+            <div class:list={[site.layout.listStyle === 'cards' ? 'post-cards' : 'post-rows']}>
+              {latest.map((p) => <PostCard slug={p.slug} data={p.data} />)}
+            </div>
+          ) : (
+            <p class="empty">// 暂无文章，先写第一篇吧</p>
+          )}
+        </section>
+      )}
+
+      {mod === 'resources' && (
+        <section>
+          <div class="section-head">
+            <span class="label">$ ls ./resources</span>
+            <span class="line"></span>
+            <a class="more" href="/resources">全部 →</a>
+          </div>
+          {latestResources.length ? (
+            <div class="res-grid">
+              {latestResources.map((r) => <ResourceCard slug={r.slug} data={r.data} />)}
+            </div>
+          ) : (
+            <p class="empty">// 资源区还空着</p>
+          )}
+        </section>
+      )}
+
+      {mod === 'tags' && (
+        <section>
+          <div class="section-head">
+            <span class="label">$ ls ./tags</span>
+            <span class="line"></span>
+            <a class="more" href="/tags">全部 →</a>
+          </div>
+          <div class="tag-cloud">
+            {tags.map((t) => <TagPill tag={t.tag} count={t.count} />)}
+          </div>
+        </section>
+      )}
+    </>
+  ))}
+</BaseLayout>

@@ -1,0 +1,15 @@
+{
+  "name": "yidonghu-blog",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "admin": "node admin/server.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.0.0"
+  }
+}

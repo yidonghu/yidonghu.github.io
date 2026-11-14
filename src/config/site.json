@@ -1,0 +1,28 @@
+{
+  "title": "yidonghu",
+  "tagline": "写代码、折腾设备、偶尔剪点视频",
+  "description": "yidonghu 的个人站点：技术笔记、B站视频配套资料，以及一个持续更新的资源分享区。",
+  "email": "yidonghu1001@163.com",
+  "github": "https://github.com/yidonghu",
+  "bilibili": "https://space.bilibili.com/702195792",
+  "since": "2026",
+  "nav": [
+    { "label": "./posts", "href": "/posts" },
+    { "label": "./archive", "href": "/archive" },
+    { "label": "./resources", "href": "/resources" },
+    { "label": "./about", "href": "/about" }
+  ],
+  "layout": {
+    "defaultTheme": "dark",
+    "accent": "#7ee787",
+    "accentAlt": "#f2cc60",
+    "accentLight": "#2f7d4f",
+    "accentAltLight": "#8a5c00",
+    "width": "76rem",
+    "listStyle": "rows",
+    "tocPosition": "right",
+    "excerptLines": 3,
+    "showGrid": true,
+    "homeModules": ["intro", "latest", "resources", "tags"]
+  }
+}

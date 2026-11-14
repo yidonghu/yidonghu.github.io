@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>blog admin</title>
+<style>
+  :root{
+    --bg:#0b0d0f; --bg1:#101316; --bg2:#161b1f; --line:#232b31; --line2:#313b44;
+    --fg:#c6ced6; --fg2:#edf2f6; --dim:#8a949e; --mute:#5b646d;
+    --acc:#7ee787; --acc2:#f2cc60; --bad:#ff8578;
+    --mono:"JetBrains Mono","Cascadia Code",Consolas,ui-monospace,monospace;
+    --sans:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+    --r:4px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.6}
+  a{color:inherit;text-decoration:none}
+  button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+
+  header{
+    position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:1.2rem;
+    height:52px;padding:0 1.2rem;border-bottom:1px solid var(--line);
+    background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .brand{color:var(--acc)}
+  .tabs{display:flex;gap:.3rem;margin-left:auto}
+  .tab{
+    padding:.35rem .7rem;border:1px solid transparent;border-radius:3px;
+    background:none;color:var(--dim);cursor:pointer;font-family:var(--mono);font-size:12.5px;
+  }
+  .tab[data-on="true"]{border-color:var(--line);background:var(--bg2);color:var(--fg2)}
+  .tab:hover{color:var(--fg2)}
+
+  main{max-width:1080px;margin:0 auto;padding:1.6rem 1.2rem 4rem}
+  .pane{display:none}
+  .pane[data-on="true"]{display:block}
+
+  .bar{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-bottom:1.1rem}
+  .bar h2{font-family:var(--mono);font-size:15px;margin:0;color:var(--fg2);font-weight:600}
+  .bar .sp{flex:1}
+  .hint{font-family:var(--mono);font-size:11.5px;color:var(--mute)}
+
+  .btn{
+    padding:.35rem .7rem;border:1px solid var(--line);border-radius:3px;background:var(--bg2);
+    color:var(--dim);cursor:pointer;font-family:var(--mono);font-size:12px;transition:.15s;
+  }
+  .btn:hover{border-color:var(--acc);color:var(--acc)}
+  .btn.main{border-color:color-mix(in srgb,var(--acc) 50%,var(--line));color:var(--acc)}
+  .btn.danger:hover{border-color:var(--bad);color:var(--bad)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  .field{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.85rem}
+  .field label{font-family:var(--mono);font-size:11.5px;color:var(--mute)}
+  .field input[type=text],.field input[type=date],.field textarea,.field select{
+    padding:.45rem .6rem;border:1px solid var(--line);border-radius:3px;background:var(--bg1);
+    color:var(--fg2);outline:0;
+  }
+  .field input:focus,.field textarea:focus,.field select:focus{border-color:color-mix(in srgb,var(--acc) 55%,var(--line))}
+  .field textarea{min-height:320px;font-family:var(--mono);font-size:13px;line-height:1.75;resize:vertical}
+  .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+  .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}
+  .check{display:flex;align-items:center;gap:.45rem;font-family:var(--mono);font-size:12px;color:var(--dim)}
+
+  .list{border-top:1px solid var(--line);font-family:var(--mono);font-size:12.5px}
+  .item{
+    display:flex;align-items:center;gap:.7rem;padding:.6rem .4rem;
+    border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);cursor:pointer;
+  }
+  .item:hover{background:color-mix(in srgb,var(--acc) 5%,transparent)}
+  .item .d{color:var(--mute);flex:0 0 5.6rem}
+  .item .t{flex:1;color:var(--fg2);font-size:13px;font-family:var(--sans);min-width:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item .tag{color:var(--mute);flex:0 0 auto}
+  .item .draft{color:var(--acc2);border:1px solid color-mix(in srgb,var(--acc2) 40%,var(--line));padding:0 .3rem;border-radius:2px}
+  .item .st-dead{color:var(--bad)}
+  .item .st-pending{color:var(--acc2)}
+
+  .drawer{
+    position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.45);display:none;
+    align-items:flex-start;justify-content:center;overflow:auto;padding:3vh 1rem;
+  }
+  .drawer[data-on="true"]{display:flex}
+  .panel{
+    width:min(860px,100%);background:var(--bg1);border:1px solid var(--line);border-radius:6px;
+    padding:1.1rem 1.2rem 1.4rem;
+  }
+  .panel-head{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;font-family:var(--mono);font-size:12px;color:var(--mute)}
+  .panel-head .sp{flex:1}
+  .preview{
+    border:1px solid var(--line);border-radius:3px;background:var(--bg);padding:1rem 1.1rem;
+    min-height:320px;font-size:14.5px;line-height:1.85;display:none;overflow:auto;
+  }
+  .preview[data-on="true"]{display:block}
+  .preview h1,.preview h2,.preview h3{font-family:var(--mono);color:var(--fg2);margin:1.2em 0 .6em}
+  .preview h2{font-size:16px;border-left:2px solid var(--acc);padding-left:.6rem}
+  .preview p{margin:.8em 0}
+  .preview pre{background:var(--bg2);border:1px solid var(--line);padding:.7rem;border-radius:3px;overflow:auto;font-size:12.5px}
+  .preview code{font-family:var(--mono);font-size:.9em;background:var(--bg2);padding:.1em .3em;border-radius:2px}
+  .preview blockquote{border-left:2px solid var(--acc2);margin:1em 0;padding:.4em .8em;color:var(--dim)}
+  .preview ul,.preview ol{padding-left:1.4em}
+  .preview a{color:var(--acc);text-decoration:underline}
+
+  .git-box{border:1px solid var(--line);border-radius:var(--r);background:var(--bg1);padding:.8rem 1rem;
+    font-family:var(--mono);font-size:12px;color:var(--dim);white-space:pre-wrap;word-break:break-all}
+  .log{margin-top:.8rem;border:1px solid var(--line);border-radius:var(--r);background:#07090a;padding:.8rem 1rem;
+    font-family:var(--mono);font-size:12px;color:#9fe0ae;max-height:320px;overflow:auto;white-space:pre-wrap}
+
+  .toast{position:fixed;left:50%;bottom:1.6rem;transform:translate(-50%,8px);padding:.45rem .9rem;
+    border:1px solid color-mix(in srgb,var(--acc) 45%,var(--line));border-radius:3px;background:var(--bg2);
+    color:var(--acc);font-family:var(--mono);font-size:12px;opacity:0;transition:.2s;pointer-events:none;z-index:40}
+  .toast[data-on="true"]{opacity:1;transform:translate(-50%,0)}
+  .toast.bad{border-color:color-mix(in srgb,var(--bad) 45%,var(--line));color:var(--bad)}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">~/blog-admin</span>
+  <span class="hint">127.0.0.1 · local only</span>
+  <nav class="tabs">
+    <button class="tab" data-pane="posts" data-on="true">文章</button>
+    <button class="tab" data-pane="resources">资源</button>
+    <button class="tab" data-pane="site">站点设置</button>
+    <button class="tab" data-pane="publish">发布</button>
+  </nav>
+</header>
+
+<main>
+  <!-- 文章 -->
+  <section class="pane" id="pane-posts" data-on="true">
+    <div class="bar">
+      <h2>文章</h2>
+      <span class="hint" id="posts-count"></span>
+      <span class="sp"></span>
+      <input type="text" id="post-filter" placeholder="搜索标题…" style="padding:.35rem .6rem;border:1px solid var(--line);border-radius:3px;background:var(--bg1);outline:0;font-family:var(--mono);font-size:12px" />
+      <button class="btn main" id="new-post">+ 新文章</button>
+    </div>
+    <div class="list" id="post-list"></div>
+  </section>
+
+  <!-- 资源 -->
+  <section class="pane" id="pane-resources">
+    <div class="bar">
+      <h2>资源分享</h2>
+      <span class="hint" id="res-count"></span>
+      <span class="sp"></span>
+      <button class="btn main" id="new-res">+ 新资源</button>
+    </div>
+    <div class="list" id="res-list"></div>
+  </section>
+
+  <!-- 站点设置 -->
+  <section class="pane" id="pane-site">
+    <div class="bar">
+      <h2>站点设置</h2>
+      <span class="hint">改完点保存，前台重新构建后生效</span>
+      <span class="sp"></span>
+      <button class="btn main" id="save-site">保存设置</button>
+    </div>
+    <div class="row" id="site-basic"></div>
+    <div class="row3" id="site-social"></div>
+    <div class="bar" style="margin-top:1.4rem"><h2 style="font-size:13px">布局</h2></div>
+    <div class="row3" id="site-layout"></div>
+  </section>
+
+  <!-- 发布 -->
+  <section class="pane" id="pane-publish">
+    <div class="bar">
+      <h2>发布</h2>
+      <span class="hint">commit + push 到 main，Actions 自动构建</span>
+    </div>
+    <div class="git-box" id="git-info">读取中…</div>
+    <div class="field" style="margin-top:1rem">
+      <label>commit 说明（可留空）</label>
+      <input type="text" id="commit-msg" placeholder="post: 新增一篇文章" />
+    </div>
+    <div class="bar">
+      <button class="btn main" id="do-publish">一键发布</button>
+      <button class="btn" id="do-build">本地构建检查</button>
+      <span class="hint" id="publish-hint"></span>
+    </div>
+    <div class="log" id="publish-log" style="display:none"></div>
+  </section>
+</main>
+
+<div class="drawer" id="drawer">
+  <div class="panel" id="panel"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const state = { posts: [], resources: [], site: null, git: null };
+
+function toast(msg, bad) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (bad ? ' bad' : '');
+  el.dataset.on = 'true';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => (el.dataset.on = 'false'), 2000);
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function api(url, options) {
+  const res = await fetch(url, options);
+  const data = await res.json().catch(() => ({ error: '返回内容不是 JSON' }));
+  if (!res.ok) throw new Error(data.error || '请求失败');
+  return data;
+}
+
+async function load() {
+  const data = await api('/api/state');
+  state.posts = data.posts;
+  state.resources = data.resources;
+  state.site = data.site;
+  state.git = data.git;
+  renderPosts();
+  renderResources();
+  renderSite();
+  renderGit();
+}
+
+/* ---------------- 文章 ---------------- */
+
+function postRow(p) {
+  const tags = Array.isArray(p.data.tags) ? p.data.tags.join(' ') : '';
+  return `
+    <div class="item" data-slug="${esc(p.slug)}" data-type="posts">
+      <span class="d">${esc(p.data.pubDate || '—')}</span>
+      <span class="t">${esc(p.data.title || p.slug)}</span>
+      ${p.data.draft ? '<span class="tag draft">草稿</span>' : ''}
+      <span class="tag">#${esc(tags)}</span>
+    </div>`;
+}
+
+function renderPosts() {
+  const list = document.getElementById('post-list');
+  list.innerHTML = state.posts.map(postRow).join('') || '<p class="hint" style="padding:1.2rem 0">还没有文章</p>';
+  document.getElementById('posts-count').textContent = state.posts.length + ' 篇';
+  list.querySelectorAll('.item').forEach((el) => {
+    el.addEventListener('click', () => openPost(el.dataset.slug));
+  });
+}
+
+function renderResources() {
+  const list = document.getElementById('res-list');
+  list.innerHTML = state.resources.map((r) => {
+    const st = r.data.status || 'ok';
+    const cls = st === 'dead' ? 'tag st-dead' : st === 'pending' ? 'tag st-pending' : 'tag';
+    return `
+      <div class="item" data-slug="${esc(r.slug)}">
+        <span class="d">${esc(r.data.platform || '')}</span>
+        <span class="t">${esc(r.data.title || r.slug)}</span>
+        <span class="${cls}">${st === 'ok' ? '有效' : st === 'pending' ? '待补' : '已失效'}</span>
+        <span class="tag">${esc(r.data.code || '—')}</span>
+      </div>`;
+  }).join('') || '<p class="hint" style="padding:1.2rem 0">还没有资源</p>';
+  document.getElementById('res-count').textContent = state.resources.length + ' 条';
+  list.querySelectorAll('.item').forEach((el) => {
+    el.addEventListener('click', () => openResource(el.dataset.slug));
+  });
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').dataset.on = 'false';
+  document.getElementById('panel').innerHTML = '';
+}
+
+function markdown(src) {
+  const parts = [];
+  let text = esc(src).replace(/```([\s\S]*?)```/g, (_, code) => {
+    parts.push(`<pre><code>${code.replace(/^\w*\n/, '')}</code></pre>`);
+    return `\u0000${parts.length - 1}\u0000`;
+  });
+  text = text
+    .replace(/^###### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^\s*&gt; (.+)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+    .replace(/\n{2,}/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  text = '<p>' + text + '</p>';
+  text = text.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
+  return text.replace(/\u0000(\d+)\u0000/g, (_, i) => parts[Number(i)]);
+}
+
+function postFields(data) {
+  const tags = Array.isArray(data.tags) ? data.tags.join(', ') : data.tags || '';
+  return `
+    <div class="field"><label>标题</label><input type="text" name="title" value="${esc(data.title || '')}" /></div>
+    <div class="row">
+      <div class="field"><label>slug（文件名）</label><input type="text" name="slug" value="" placeholder="留空自动生成" /></div>
+      <div class="field"><label>发布日期</label><input type="date" name="pubDate" value="${esc(String(data.pubDate || '').slice(0, 10))}" /></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>标签（逗号分隔）</label><input type="text" name="tags" value="${esc(tags)}" /></div>
+      <div class="field"><label>分类</label><input type="text" name="category" value="${esc(data.category || '')}" /></div>
+    </div>
+    <div class="field"><label>摘要（列表页与 SEO 用）</label><input type="text" name="description" value="${esc(data.description || '')}" /></div>
+    <div class="row">
+      <label class="check"><input type="checkbox" name="draft" ${data.draft ? 'checked' : ''} /> 存为草稿</label>
+      <label class="check"><input type="checkbox" name="pinned" ${data.pinned ? 'checked' : ''} /> 置顶</label>
+    </div>`;
+}
+
+function openPost(slug) {
+  const item = slug ? state.posts.find((p) => p.slug === slug) : null;
+  const data = item ? item.data : { pubDate: new Date().toISOString().slice(0, 10) };
+  const body = item ? item.body : '';
+  document.getElementById('panel').innerHTML = `
+    <div class="panel-head">
+      <span>${item ? '编辑文章' : '新建文章'}</span>
+      <span class="sp"></span>
+      <button class="btn" id="toggle-preview">预览</button>
+      ${item ? '<button class="btn danger" id="del-post">删除</button>' : ''}
+      <button class="btn" id="close-panel">关闭</button>
+    </div>
+    <div id="fields">${postFields(data)}</div>
+    <div class="field"><label>正文（Markdown）</label><textarea id="body">${esc(body)}</textarea></div>
+    <div class="preview" id="preview"></div>
+    <div class="bar" style="margin-top:.4rem">
+      <button class="btn main" id="save-post">保存</button>
+      <span class="hint">保存后记得去「发布」推送到 GitHub</span>
+    </div>`;
+  document.getElementById('drawer').dataset.on = 'true';
+
+  document.getElementById('close-panel').addEventListener('click', closeDrawer);
+  document.getElementById('toggle-preview').addEventListener('click', () => {
+    const pv = document.getElementById('preview');
+    const ta = document.getElementById('body');
+    if (pv.dataset.on === 'true') {
+      pv.dataset.on = 'false';
+      ta.style.display = '';
+    } else {
+      pv.innerHTML = markdown(ta.value);
+      pv.dataset.on = 'true';
+      ta.style.display = 'none';
+    }
+  });
+
+  document.getElementById('save-post').addEventListener('click', async () => {
+    const f = document.getElementById('fields');
+    const get = (n) => f.querySelector(`[name="${n}"]`);
+    const payload = {
+      slug: item ? item.slug : (get('slug').value.trim() || null),
+      create: !item,
+      data: {
+        title: get('title').value.trim(),
+        description: get('description').value.trim(),
+        pubDate: get('pubDate').value || new Date().toISOString().slice(0, 10),
+        tags: get('tags').value.split(',').map((s) => s.trim()).filter(Boolean),
+        category: get('category').value.trim(),
+        draft: get('draft').checked,
+        pinned: get('pinned').checked,
+      },
+      body: document.getElementById('body').value,
+    };
+    if (!payload.data.title) return toast('标题不能为空', true);
+    try {
+      await api('/api/post', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      toast('已保存');
+      closeDrawer();
+      await load();
+    } catch (e) {
+      toast(e.message, true);
+    }
+  });
+
+  const del = document.getElementById('del-post');
+  if (del) del.addEventListener('click', async () => {
+    if (!confirm(`删除 ${slug}.md？该操作会删除文件（可被 git 回滚）。`)) return;
+    try {
+      await api(`/api/post?slug=${encodeURIComponent(slug)}`, { method: 'DELETE' });
+      toast('已删除');
+      closeDrawer();
+      await load();
+    } catch (e) { toast(e.message, true); }
+  });
+}
+
+/* ---------------- 资源 ---------------- */
+
+function resFields(data) {
+  const tags = Array.isArray(data.tags) ? data.tags.join(', ') : data.tags || '';
+  const plats = [['baidu','百度网盘'],['quark','夸克网盘'],['aliyun','阿里云盘'],['lanzou','蓝奏 / 123'],['github','GitHub']];
+  const stats = [['ok','有效'],['pending','待补'],['dead','已失效']];
+  const sel = (arr, v) => arr.map(([k, l]) => `<option value="${k}" ${k === v ? 'selected' : ''}>${l}</option>`).join('');
+  return `
+    <div class="field"><label>资源标题</label><input type="text" name="title" value="${esc(data.title || '')}" /></div>
+    <div class="row3">
+      <div class="field"><label>网盘</label><select name="platform">${sel(plats, data.platform || 'baidu')}</select></div>
+      <div class="field"><label>状态</label><select name="status">${sel(stats, data.status || 'ok')}</select></div>
+      <div class="field"><label>体积</label><input type="text" name="size" value="${esc(data.size || '')}" /></div>
+    </div>
+    <div class="field"><label>分享链接</label><input type="text" name="url" value="${esc(data.url || '')}" /></div>
+    <div class="row">
+      <div class="field"><label>提取码</label><input type="text" name="code" value="${esc(data.code || '')}" /></div>
+      <div class="field"><label>更新时间</label><input type="date" name="updated" value="${esc(String(data.updated || '').slice(0, 10))}" /></div>
+    </div>
+    <div class="field"><label>标签（逗号分隔）</label><input type="text" name="tags" value="${esc(tags)}" /></div>
+    <div class="field"><label>一句话说明</label><input type="text" name="summary" value="${esc(data.summary || '')}" /></div>`;
+}
+
+function openResource(slug) {
+  const item = slug ? state.resources.find((r) => r.slug === slug) : null;
+  const data = item ? item.data : { status: 'ok', platform: 'baidu', updated: new Date().toISOString().slice(0, 10) };
+  document.getElementById('panel').innerHTML = `
+    <div class="panel-head">
+      <span>${item ? '编辑资源' : '新建资源'}</span>
+      <span class="sp"></span>
+      ${item ? '<button class="btn danger" id="del-res">删除</button>' : ''}
+      <button class="btn" id="close-panel">关闭</button>
+    </div>
+    <div id="fields">${resFields(data)}</div>
+    <div class="field"><label>使用说明（Markdown，可留空）</label><textarea id="body" style="min-height:180px">${esc(item ? item.body : '')}</textarea></div>
+    <div class="bar" style="margin-top:.4rem">
+      <button class="btn main" id="save-res">保存</button>
+      <span class="hint" id="res-slug-hint">${item ? item.slug + '.md' : '文件名自动生成'}</span>
+    </div>`;
+  document.getElementById('drawer').dataset.on = 'true';
+  document.getElementById('close-panel').addEventListener('click', closeDrawer);
+
+  document.getElementById('save-res').addEventListener('click', async () => {
+    const f = document.getElementById('fields');
+    const get = (n) => f.querySelector(`[name="${n}"]`);
+    const payload = {
+      slug: item ? item.slug : null,
+      create: !item,
+      data: {
+        title: get('title').value.trim(),
+        platform: get('platform').value,
+        url: get('url').value.trim(),
+        code: get('code').value.trim(),
+        size: get('size').value.trim(),
+        updated: get('updated').value || new Date().toISOString().slice(0, 10),
+        tags: get('tags').value.split(',').map((s) => s.trim()).filter(Boolean),
+        status: get('status').value,
+        summary: get('summary').value.trim(),
+      },
+      body: document.getElementById('body').value,
+    };
+    if (!payload.data.title) return toast('标题不能为空', true);
+    if (!payload.data.url) return toast('分享链接不能为空', true);
+    try {
+      await api('/api/resource', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      toast('已保存');
+      closeDrawer();
+      await load();
+    } catch (e) { toast(e.message, true); }
+  });
+
+  const del = document.getElementById('del-res');
+  if (del) del.addEventListener('click', async () => {
+    if (!confirm(`删除 ${slug}.md？`)) return;
+    try {
+      await api(`/api/resource?slug=${encodeURIComponent(slug)}`, { method: 'DELETE' });
+      toast('已删除');
+      closeDrawer();
+      await load();
+    } catch (e) { toast(e.message, true); }
+  });
+}
+
+/* ---------------- 站点设置 ---------------- */
+
+function fieldHtml(label, name, value) {
+  return `<div class="field"><label>${label}</label><input type="text" name="${name}" value="${esc(value ?? '')}" /></div>`;
+}
+
+function renderSite() {
+  const s = state.site;
+  if (!s) return;
+  document.getElementById('site-basic').innerHTML =
+    fieldHtml('站名', 'title', s.title) + fieldHtml('tagline', 'tagline', s.tagline) +
+    fieldHtml('站点描述', 'description', s.description) + fieldHtml('起始年份', 'since', s.since);
+  document.getElementById('site-social').innerHTML =
+    fieldHtml('邮箱', 'email', s.email) + fieldHtml('GitHub', 'github', s.github) + fieldHtml('B站', 'bilibili', s.bilibili);
+  const l = s.layout || {};
+  document.getElementById('site-layout').innerHTML =
+    `<div class="field"><label>列表样式</label><select name="listStyle">
+      <option value="rows" ${l.listStyle === 'rows' ? 'selected' : ''}>命令行行式（rows）</option>
+      <option value="cards" ${l.listStyle === 'cards' ? 'selected' : ''}>卡片式（cards）</option>
+    </select></div>` +
+    `<div class="field"><label>目录位置</label><select name="tocPosition">
+      <option value="right" ${l.tocPosition === 'right' ? 'selected' : ''}>右侧</option>
+      <option value="hidden" ${l.tocPosition === 'hidden' ? 'selected' : ''}>隐藏</option>
+    </select></div>` +
+    `<div class="field"><label>默认主题</label><select name="defaultTheme">
+      <option value="dark" ${l.defaultTheme === 'dark' ? 'selected' : ''}>暗色</option>
+      <option value="light" ${l.defaultTheme === 'light' ? 'selected' : ''}>亮色</option>
+    </select></div>` +
+    fieldHtml('正文宽度', 'width', l.width) +
+    fieldHtml('主题色（暗）', 'accent', l.accent) +
+    fieldHtml('辅助色（暗）', 'accentAlt', l.accentAlt) +
+    fieldHtml('主题色（亮）', 'accentLight', l.accentLight) +
+    fieldHtml('辅助色（亮）', 'accentAltLight', l.accentAltLight) +
+    fieldHtml('首页模块（逗号分隔：intro,latest,resources,tags）', 'homeModules', (l.homeModules || []).join(',')) +
+    `<div class="field"><label>背景网格</label><select name="showGrid">
+      <option value="true" ${l.showGrid ? 'selected' : ''}>显示</option>
+      <option value="false" ${!l.showGrid ? 'selected' : ''}>隐藏</option>
+    </select></div>`;
+}
+
+document.getElementById('save-site').addEventListener('click', async () => {
+  const all = document.getElementById('pane-site').querySelectorAll('input,select');
+  const vals = {};
+  all.forEach((el) => (vals[el.name] = el.value));
+  const s = structuredClone(state.site);
+  ['title', 'tagline', 'description', 'since', 'email'].forEach((k) => (s[k] = vals[k]));
+  s.github = vals.github;
+  s.bilibili = vals.bilibili;
+  s.layout.listStyle = vals.listStyle;
+  s.layout.tocPosition = vals.tocPosition;
+  s.layout.defaultTheme = vals.defaultTheme;
+  s.layout.width = vals.width || s.layout.width;
+  s.layout.accent = vals.accent;
+  s.layout.accentAlt = vals.accentAlt;
+  s.layout.accentLight = vals.accentLight;
+  s.layout.accentAltLight = vals.accentAltLight;
+  s.layout.showGrid = vals.showGrid === 'true';
+  s.layout.homeModules = vals.homeModules.split(',').map((x) => x.trim()).filter(Boolean);
+  try {
+    await api('/api/site', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ site: s }) });
+    state.site = s;
+    toast('设置已保存');
+    await load();
+  } catch (e) { toast(e.message, true); }
+});
+
+/* ---------------- 发布 ---------------- */
+
+function renderGit() {
+  const g = state.git;
+  document.getElementById('git-info').textContent =
+    `分支    : ${g.branch || '（尚未 git init）'}\n` +
+    `远端    : ${g.remote || '（未配置）'}\n` +
+    `最近提交: ${g.lastCommit || '（无提交）'}\n` +
+    `未提交改动: ${g.status ? '\n' + g.status : '无'}`;
+}
+
+function showLog(text) {
+  const el = document.getElementById('publish-log');
+  el.style.display = 'block';
+  el.textContent = text;
+}
+
+document.getElementById('do-publish').addEventListener('click', async () => {
+  const btn = document.getElementById('do-publish');
+  btn.disabled = true;
+  try {
+    const r = await api('/api/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: document.getElementById('commit-msg').value }),
+    });
+    showLog((r.logs || []).join('\n\n') + (r.pushed ? '\n\n已推送，等 Actions 构建完成即可访问站点。' : ''));
+    toast(r.pushed ? '已推送' : '无需推送');
+    await load();
+  } catch (e) {
+    showLog(e.message);
+    toast(e.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('do-build').addEventListener('click', () => {
+  showLog('本地构建请在终端执行：npm run build\n构建产物在 dist/，预览用 npm run preview');
+  toast('已显示提示');
+});
+
+/* ---------------- 初始化 ---------------- */
+
+document.querySelectorAll('.tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach((t) => (t.dataset.on = 'false'));
+    tab.dataset.on = 'true';
+    document.querySelectorAll('.pane').forEach((p) => (p.dataset.on = 'false'));
+    document.getElementById('pane-' + tab.dataset.pane).dataset.on = 'true';
+  });
+});
+
+document.getElementById('new-post').addEventListener('click', () => openPost(null));
+document.getElementById('new-res').addEventListener('click', () => openResource(null));
+document.getElementById('post-filter').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#post-list .item').forEach((el) => {
+    el.style.display = !q || el.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+document.getElementById('drawer').addEventListener('click', (e) => {
+  if (e.target.id === 'drawer') closeDrawer();
+});
+
+load().catch((e) => toast(e.message, true));
+</script>
+</body>
+</html>

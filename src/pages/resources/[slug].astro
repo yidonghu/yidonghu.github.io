@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllResources, formatDate } from '../../lib/content';
+import { site } from '../../config/site';
+
+export async function getStaticPaths() {
+  return getAllResources().map((r) => ({ params: { slug: r.slug }, props: { res: r } }));
+}
+
+const { res } = Astro.props;
+const data = res.data;
+const tags: string[] = Array.isArray(data.tags) ? data.tags : [];
+const statusLabel: Record<string, string> = { ok: '有效', pending: '待补', dead: '已失效' };
+const platformLabel: Record<string, string> = {
+  baidu: '百度网盘',
+  quark: '夸克网盘',
+  aliyun: '阿里云盘',
+  lanzou: '蓝奏 / 123',
+  github: 'GitHub',
+  magnet: '磁力',
+};
+const reportUrl = `${site.github}/yidonghu.github.io/issues/new?title=${encodeURIComponent(
+  `[资源失效] ${data.title}`
+)}&body=${encodeURIComponent(`资源：${data.title}\n链接：${data.url}\n问题：`)}`;
+---
+<BaseLayout title={data.title} description={data.summary} kind="article">
+  <div class="breadcrumb">
+    <a href="/resources">~/resources</a> / <span>{res.slug}.md</span>
+  </div>
+
+  <header class="post-head">
+    <h1>{data.title}</h1>
+    <div class="post-meta">
+      <span class="badge" data-platform={data.platform}>{platformLabel[data.platform] ?? data.platform}</span>
+      <span class="badge" data-status={data.status ?? 'ok'}>{statusLabel[data.status ?? 'ok']}</span>
+      {data.size && <><span class="sep">·</span><span>{data.size}</span></>}
+      {data.updated && <><span class="sep">·</span><span>更新于 {formatDate(data.updated)}</span></>}
+    </div>
+  </header>
+
+  <div class="post-layout">
+    <div>
+      <div class="res-actions" style="border-top:0; padding-top:0; margin-bottom:1.8rem">
+        <button class="btn btn-main" type="button" data-copy={data.url} data-copy-label="链接已复制">复制链接</button>
+        {data.code && (
+          <button class="btn" type="button" data-copy={data.code} data-copy-label="提取码已复制">
+            提取码 {data.code}
+          </button>
+        )}
+        <a class="btn btn-ghost" href={data.url} target="_blank" rel="noopener">打开链接</a>
+        <a class="btn btn-ghost" href={reportUrl} target="_blank" rel="noopener">报告失效</a>
+      </div>
+
+      <article class="prose">
+        {res.body.trim() ? (
+          <res.Content />
+        ) : (
+          <p>{data.summary}</p>
+        )}
+        {tags.length > 0 && <p class="mute" style="font-family:var(--mono);font-size:12px">tags: {tags.map((t) => `#${t}`).join(' ')}</p>}
+      </article>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,29 @@
+---
+import { site } from '../config/site';
+import { formatDate } from '../lib/content';
+
+interface Props {
+  slug: string;
+  data: Record<string, any>;
+}
+
+const { slug, data } = Astro.props;
+const style = site.layout.listStyle;
+const date = formatDate(data.pubDate);
+const tags: string[] = Array.isArray(data.tags) ? data.tags : [];
+const excerpt = data.description ?? '';
+---
+{style === 'cards' ? (
+  <a class="post-card" href={`/posts/${slug}/`}>
+    <span class="meta">{date} · {tags.map((t) => `#${t}`).join(' ')}</span>
+    <h3>{data.title}</h3>
+    {excerpt && <p>{excerpt}</p>}
+  </a>
+) : (
+  <a class="post-row" href={`/posts/${slug}/`}>
+    <span class="post-date">{date}</span>
+    <span class="post-title">{data.title}</span>
+    <span class="leader" aria-hidden="true"></span>
+    <span class="post-tags">{tags.map((t) => `#${t}`).join(' ')}</span>
+  </a>
+)}

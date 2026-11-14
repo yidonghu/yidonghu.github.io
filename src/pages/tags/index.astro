@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagPill from '../../components/TagPill.astro';
+import { getAllPosts, allTags } from '../../lib/content';
+
+const posts = getAllPosts();
+const tags = allTags(posts);
+---
+<BaseLayout title="标签" description="按标签浏览文章">
+  <div class="section-head" style="margin-top:0">
+    <span class="label">$ ls ./tags</span>
+    <span class="line"></span>
+    <span class="more">{tags.length} tags</span>
+  </div>
+  <div class="tag-cloud">
+    {tags.map((t) => <TagPill tag={t.tag} count={t.count} />)}
+  </div>
+</BaseLayout>

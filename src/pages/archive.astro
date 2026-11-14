@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { site } from '../config/site';
+import { getAllPosts } from '../lib/content';
+
+const posts = getAllPosts();
+const groups = new Map<string, typeof posts>();
+for (const p of posts) {
+  const y = new Date(p.data.pubDate).getFullYear().toString();
+  if (!groups.has(y)) groups.set(y, []);
+  groups.get(y)!.push(p);
+}
+const years = [...groups.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+---
+<BaseLayout title="归档" description="按年份浏览全部文章">
+  <div class="section-head" style="margin-top:0">
+    <span class="label">$ find ./posts -type f | sort</span>
+    <span class="line"></span>
+    <span class="more">{posts.length} posts</span>
+  </div>
+
+  {years.map(([year, items]) => (
+    <section class="year-block">
+      <div class="year-title">{year} — {items.length} posts</div>
+      <div class:list={[site.layout.listStyle === 'cards' ? 'post-cards' : 'post-rows']} style="border-top:0">
+        {items.map((p) => <PostCard slug={p.slug} data={p.data} />)}
+      </div>
+    </section>
+  ))}
+</BaseLayout>

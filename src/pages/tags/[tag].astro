@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { site } from '../../config/site';
+import { getAllPosts } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const tags = new Set<string>();
+  for (const p of getAllPosts()) {
+    const t: string[] = Array.isArray(p.data.tags) ? p.data.tags : [];
+    t.forEach((x) => tags.add(x));
+  }
+  return [...tags].map((tag) => ({ params: { tag } }));
+}
+
+const { tag } = Astro.params;
+const posts = getAllPosts().filter((p) => {
+  const t: string[] = Array.isArray(p.data.tags) ? p.data.tags : [];
+  return t.includes(tag!);
+});
+---
+<BaseLayout title={`#${tag}`} description={`标签 ${tag} 下的文章`}>
+  <div class="section-head" style="margin-top:0">
+    <span class="label">$ grep -r "#{tag}" ./posts</span>
+    <span class="line"></span>
+    <span class="more">{posts.length} items</span>
+  </div>
+  <div class:list={[site.layout.listStyle === 'cards' ? 'post-cards' : 'post-rows']}>
+    {posts.map((p) => <PostCard slug={p.slug} data={p.data} />)}
+  </div>
+  <p style="margin-top:2rem"><a href="/tags" class="mono mute">← 返回标签墙</a></p>
+</BaseLayout>

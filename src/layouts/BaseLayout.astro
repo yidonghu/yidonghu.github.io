@@ -1,0 +1,143 @@
+---
+import { site, layout, cssVariables } from '../config/site';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  kind?: 'page' | 'article';
+}
+
+const { title, description, kind = 'page' } = Astro.props;
+const fullTitle = title ? `${title} · ${site.title}` : `${site.title} — ${site.tagline}`;
+const desc = description ?? site.description;
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+const vars = cssVariables();
+---
+<!doctype html>
+<html lang="zh-CN" data-theme={layout.defaultTheme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <meta name="generator" content="Astro" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content={kind === 'article' ? 'article' : 'website'} />
+    <meta property="og:site_name" content={site.title} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.title} · RSS`} href="/rss.xml" />
+    <script is:inline>
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+    <style is:inline set:html={vars} />
+  </head>
+  <body class:list={[layout.showGrid ? '' : 'no-grid']}>
+    <header class="site-head">
+      <div class="shell head-inner">
+        <a class="brand" href="/"><span class="tilde">~/</span>{site.title}<span class="cursor">_</span></a>
+        <nav class="nav" aria-label="主导航">
+          {site.nav.map((item) => (
+            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        <div class="head-tools">
+          <button class="icon-btn" id="theme-toggle" type="button" title="切换明暗模式" aria-label="切换明暗模式">
+            <span id="theme-icon">◐</span>
+          </button>
+          <a class="icon-btn" href="/rss.xml" title="RSS 订阅" aria-label="RSS 订阅">rss</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell page">
+      <slot />
+    </main>
+
+    <footer class="site-foot">
+      <div class="shell foot-inner">
+        <span>© {site.since}–2026 {site.title}</span>
+        <span class="mute">built with astro · hosted on github pages</span>
+        <span class="spacer"></span>
+        <a href={site.github} rel="me noopener" target="_blank">github</a>
+        <a href={site.bilibili} rel="me noopener" target="_blank">bilibili</a>
+        <a href="/rss.xml">rss</a>
+      </div>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script is:inline>
+      // 明暗模式
+      (function () {
+        var root = document.documentElement;
+        var btn = document.getElementById('theme-toggle');
+        var icon = document.getElementById('theme-icon');
+        function paint() {
+          if (icon) icon.textContent = root.dataset.theme === 'light' ? '☀' : '◐';
+        }
+        paint();
+        if (btn) {
+          btn.addEventListener('click', function () {
+            var next = root.dataset.theme === 'light' ? 'dark' : 'light';
+            root.dataset.theme = next;
+            try { localStorage.setItem('theme', next); } catch (e) {}
+            paint();
+          });
+        }
+        if (!localStorage.getItem('theme') && window.matchMedia) {
+          // 未手动选择时跟随系统
+          var mq = window.matchMedia('(prefers-color-scheme: light)');
+          root.dataset.theme = mq.matches ? 'light' : 'dark';
+          paint();
+        }
+      })();
+
+      // 复制 + 提示
+      (function () {
+        var toast = document.getElementById('toast');
+        var timer = null;
+        window.__toast = function (msg) {
+          if (!toast) return;
+          toast.textContent = msg;
+          toast.dataset.show = 'true';
+          clearTimeout(timer);
+          timer = setTimeout(function () { toast.dataset.show = 'false'; }, 1800);
+        };
+        document.addEventListener('click', function (e) {
+          var el = e.target.closest('[data-copy]');
+          if (!el) return;
+          e.preventDefault();
+          var text = el.getAttribute('data-copy') || '';
+          var label = el.getAttribute('data-copy-label') || '已复制';
+          if (!text) return;
+          var done = function () { window.__toast(label); };
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done).catch(function () { fallback(text, done); });
+          } else {
+            fallback(text, done);
+          }
+        });
+        function fallback(text, done) {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); done(); } catch (err) { window.__toast('复制失败，请手动选择'); }
+          document.body.removeChild(ta);
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+# 构建产物
+dist/
+.astro/
+
+# 依赖
+node_modules/
+
+# 本地后台密钥 / 临时文件
+.env
+admin/.token
+*.log
+
+# 系统文件
+Thumbs.db
+.DS_Store

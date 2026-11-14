@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="404">
+  <div class="term" style="max-width:38rem;margin:4rem auto">
+    <div class="term-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="term-title">~/404 — zsh</span>
+    </div>
+    <div class="term-body">
+      <p class="cmd"><span class="prompt">$</span>cat /this/page</p>
+      <p class="out" style="color:var(--danger)">cat: /this/page: No such file or directory</p>
+      <p class="cmd"><span class="prompt">$</span>cd ~</p>
+      <p class="out"><a href="/" style="color:var(--accent)">返回首页 →</a></p>
+    </div>
+  </div>
+</BaseLayout>

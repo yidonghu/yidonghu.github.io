@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagPill from '../../components/TagPill.astro';
+import { site } from '../../config/site';
+import { getAllPosts, formatDate } from '../../lib/content';
+
+export async function getStaticPaths() {
+  return getAllPosts().map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const posts = getAllPosts();
+const idx = posts.findIndex((p) => p.slug === post.slug);
+const older = posts[idx + 1];
+const newer = posts[idx - 1];
+const tags: string[] = Array.isArray(post.data.tags) ? post.data.tags : [];
+const showToc = site.layout.tocPosition !== 'hidden' && post.headings.length > 0;
+---
+<BaseLayout title={post.data.title} description={post.data.description} kind="article">
+  <div class="breadcrumb">
+    <a href="/posts">~/posts</a> / <span>{post.slug}.md</span>
+  </div>
+
+  <header class="post-head">
+    <h1>{post.data.title}</h1>
+    <div class="post-meta">
+      <span>{formatDate(post.data.pubDate)}</span>
+      <span class="sep">·</span>
+      <span>{post.readingTime} min read</span>
+      {post.data.category && <><span class="sep">·</span><span>{post.data.category}</span></>}
+      {tags.length > 0 && <><span class="sep">·</span>{tags.map((t) => <TagPill tag={t} />)}</>}
+    </div>
+  </header>
+
+  <div class="post-layout">
+    <article class="prose">
+      <post.Content />
+    </article>
+
+    {showToc && (
+      <aside class="toc" aria-label="目录">
+        <div class="toc-title"># index</div>
+        <ul>
+          {post.headings
+            .filter((h) => h.depth <= 3)
+            .map((h) => (
+              <li class:list={[h.depth === 3 ? 'd3' : '']}>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+        </ul>
+      </aside>
+    )}
+  </div>
+
+  <nav class="post-nav">
+    {older && (
+      <a href={`/posts/${older.slug}/`}>
+        <span class="dir">← 上一篇（更早）</span>
+        <span class="ttl">{older.data.title}</span>
+      </a>
+    )}
+    {newer && (
+      <a href={`/posts/${newer.slug}/`} style="text-align:right">
+        <span class="dir">下一篇（更新）→</span>
+        <span class="ttl">{newer.data.title}</span>
+      </a>
+    )}
+  </nav>
+</BaseLayout>

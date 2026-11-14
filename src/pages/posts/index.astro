@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import TagPill from '../../components/TagPill.astro';
+import { site } from '../../config/site';
+import { getAllPosts, allTags } from '../../lib/content';
+
+const posts = getAllPosts();
+const tags = allTags(posts);
+---
+<BaseLayout title="文章" description={`${site.title} 的全部文章`}>
+  <div class="section-head" style="margin-top:0">
+    <span class="label">$ ls ./posts --sort=date</span>
+    <span class="line"></span>
+    <span class="more">{posts.length} items</span>
+  </div>
+
+  <div class="search-box">
+    <span class="prompt">$</span>
+    <input
+      id="post-search"
+      type="search"
+      placeholder="grep 标题 / 标签 / 摘要…"
+      autocomplete="off"
+      spellcheck="false"
+      aria-label="搜索文章"
+    />
+  </div>
+  <div class="search-result" id="post-search-result"></div>
+
+  {posts.length ? (
+    <div class:list={[site.layout.listStyle === 'cards' ? 'post-cards' : 'post-rows']} id="post-list">
+      {posts.map((p) => <PostCard slug={p.slug} data={p.data} />)}
+    </div>
+  ) : (
+    <p class="empty">// 暂无文章</p>
+  )}
+
+  {tags.length > 0 && (
+    <section>
+      <div class="section-head">
+        <span class="label">$ ls ./tags</span>
+        <span class="line"></span>
+      </div>
+      <div class="tag-cloud">
+        {tags.map((t) => <TagPill tag={t.tag} count={t.count} />)}
+      </div>
+    </section>
+  )}
+
+  <script is:inline>
+    (function () {
+      var input = document.getElementById('post-search');
+      var list = document.getElementById('post-list');
+      var result = document.getElementById('post-search-result');
+      if (!input || !list) return;
+      var items = Array.prototype.slice.call(list.children);
+      function apply() {
+        var q = input.value.trim().toLowerCase();
+        var shown = 0;
+        items.forEach(function (el) {
+          var hay = (el.textContent || '').toLowerCase();
+          var hit = !q || hay.indexOf(q) !== -1;
+          el.style.display = hit ? '' : 'none';
+          if (hit) shown++;
+        });
+        result.textContent = q ? '// ' + shown + ' 条匹配 "' + input.value.trim() + '"' : '';
+      }
+      input.addEventListener('input', apply);
+    })();
+  </script>
+</BaseLayout>
