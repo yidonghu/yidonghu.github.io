@@ -34,7 +34,7 @@
     "listStyle": "rows",
     "tocPosition": "right",
     "excerptLines": 3,
-    "showGrid": true,
+    "showGrid": false,
     "homeModules": [
       "intro",
       "latest",
