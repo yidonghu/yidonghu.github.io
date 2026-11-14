@@ -71,19 +71,20 @@ a {
 }
 
 html[data-theme="light"] {
-  --bg: #f7f5ee;
-  --bg-1: #fbfaf3;
-  --bg-2: #efecdf;
-  --line: #ddd6c5;
-  --line-2: #c6bda6;
-  --line-soft: #e7e1d2;
+  /* 低眩光纸感：背景压暗一档，文字对比度全部 ≥ 4.5:1 */
+  --bg: #e7e5dd;
+  --bg-1: #f0eee7;
+  --bg-2: #dcd8cd;
+  --line: #c2bcad;
+  --line-2: #ada694;
+  --line-soft: #ded9cc;
 
-  --fg: #363c42;
-  --fg-strong: #11161a;
-  --fg-dim: #6a737b;
-  --fg-mute: #9aa2a8;
+  --fg: #262b2f;
+  --fg-strong: #0e1216;
+  --fg-dim: #4b5358;
+  --fg-mute: #5c6469;
 
-  --danger: #c33a2b;
+  --danger: #b4291a;
 }
 
 /* ---------- 布局容器 ---------- */
@@ -544,6 +545,36 @@ h2.block-title {
   border-color: color-mix(in srgb, var(--danger) 40%, var(--line));
 }
 
+/* 亮色模式下的平台徽章：改用深色系，保证在浅底上可读 */
+html[data-theme="light"] .badge {
+  background: color-mix(in srgb, currentColor 5%, var(--bg-1));
+}
+
+html[data-theme="light"] .badge[data-platform="baidu"] {
+  color: #14507f;
+  border-color: #93b4cd;
+}
+
+html[data-theme="light"] .badge[data-platform="quark"] {
+  color: #0f5c4a;
+  border-color: #8bbcab;
+}
+
+html[data-theme="light"] .badge[data-platform="aliyun"] {
+  color: #8a3b12;
+  border-color: #cba08a;
+}
+
+html[data-theme="light"] .badge[data-platform="lanzou"] {
+  color: #5b3a8a;
+  border-color: #ab9bc5;
+}
+
+html[data-theme="light"] .badge[data-platform="github"] {
+  color: #3a444d;
+  border-color: #adb3b8;
+}
+
 .res-card h3 {
   margin: 0;
   font-size: 15.5px;
@@ -797,6 +828,8 @@ h2.block-title {
   padding: 0;
   background: none;
   font-size: inherit;
+  /* 代码块底色由 Shiki 内联给出，这里必须继承，否则亮色主题下未着色的标点会变黑 */
+  color: inherit;
 }
 
 .prose blockquote {
