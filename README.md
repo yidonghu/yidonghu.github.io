@@ -19,8 +19,10 @@
 
 | 文件 | 作用 |
 | --- | --- |
-| `启动管理后台.bat` | 启动后台并自动打开 http://127.0.0.1:7788 |
-| `启动本地预览.bat` | 启动本地预览（`astro dev`）并自动打开 http://localhost:4321 |
+| `启动管理后台.bat` | 启动后台并自动打开 `http://127.0.0.1:<adminPort>` |
+| `启动本地预览.bat` | 启动本地预览（`astro dev`）并自动打开 `http://127.0.0.1:<previewPort>` |
+
+两个脚本的端口都从 `app.config.json` 读，改配置即可，不用动 bat 本身。
 
 脚本会自己处理这几种情况：
 
@@ -35,6 +37,7 @@
 
 ```
 blog_v2.0/
+├─ app.config.json          # 本地端口、git 身份等「可填写配置」
 ├─ src/
 │  ├─ config/
 │  │  ├─ site.json          # 站点信息 + 布局开关（改布局只改这里）
@@ -50,11 +53,44 @@ blog_v2.0/
 ├─ admin/
 │  ├─ server.mjs            # 本地后台服务（零依赖，仅监听 127.0.0.1）
 │  └─ ui/index.html         # 后台界面（单文件）
+├─ scripts/
+│  ├─ check.mjs             # 内容体检（构建前跑，提前发现字段缺失）
+│  └─ port.mjs              # 给 bat 读端口用
+├─ docs/
+│  └─ 搭建方案.md            # 最初的技术方案与实施记录
 ├─ public/favicon.svg
 ├─ 启动管理后台.bat
 ├─ 启动本地预览.bat
 └─ .github/workflows/deploy.yml
 ```
+
+## 可填写的配置
+
+两处，职责不重叠：
+
+| 文件 | 管什么 | 谁在读它 |
+| --- | --- | --- |
+| `app.config.json` | 本地调试：预览端口、后台端口、等待秒数、git 身份与远端 | 两个 bat、`admin/server.mjs`、`scripts/port.mjs` |
+| `src/config/site.json` | 站点内容与外观：站名、简介、导航、布局、主题色 | 构建时由 `src/config/site.ts` 读取，后台「站点设置」也会写回 |
+
+```json
+{
+  "local": {
+    "previewPort": 4321,
+    "adminPort": 7788,
+    "waitSeconds": 40
+  },
+  "git": {
+    "userName": "yidonghu",
+    "userEmail": "yidonghu1001@163.com",
+    "remote": "https://github.com/yidonghu/yidonghu.github.io.git"
+  }
+}
+```
+
+- 端口改成别的值后，重新双击 bat 生效；`ADMIN_PORT` 环境变量的优先级高于这里
+- 文件缺失或写坏不会让服务起不来：端口回退 4321 / 7788，git 项走仓库自身的 `git config`
+- `site.json` 里的字段说明见下文「调整布局」
 
 ## 常用命令
 
@@ -65,6 +101,22 @@ blog_v2.0/
 | `npm run build` | 生成静态文件到 `dist/` |
 | `npm run preview` | 预览 `dist/` 构建产物 |
 | `npm run admin` | 启动本地管理后台 |
+| `npm run check` | 内容体检：字段缺失、链接非法、占位符残留 |
+| `npm run port:admin` / `port:preview` | 打印 bat 实际会用的端口 |
+
+## 出问题怎么查
+
+按这个顺序排查，基本能定位到具体一层：
+
+| 现象 | 先跑 | 看什么 |
+| --- | --- | --- |
+| 构建报错、页面缺内容 | `npm run check` | 哪个文件缺字段、链接是不是占位符 |
+| 改了数据但页面没变 | `npm run build` 后看 `dist/` 是否有对应目录 | 是没构建，还是浏览器缓存（`Ctrl+Shift+R`） |
+| 后台保存失败 | 浏览器 F12 → Network 看 `/api/post` 等响应 | 409 通常是同名文件已存在 |
+| 端口被占用 / bat 打不开页面 | `npm run port:admin` | 实际端口；再用 `netstat -ano \| findstr :端口` 找进程 |
+| 线上没更新 | Actions 页面 | 最新一次工作流是否绿色，失败点在哪一步 |
+
+`app.config.json` 支持把端口换成空闲值，免去杀进程：改完重新双击 bat 即可。
 
 ## 发一篇文章
 

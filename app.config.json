@@ -1,0 +1,12 @@
+{
+  "local": {
+    "previewPort": 4321,
+    "adminPort": 7788,
+    "waitSeconds": 40
+  },
+  "git": {
+    "userName": "yidonghu",
+    "userEmail": "yidonghu1001@163.com",
+    "remote": "https://github.com/yidonghu/yidonghu.github.io.git"
+  }
+}

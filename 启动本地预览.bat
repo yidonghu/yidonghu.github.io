@@ -4,14 +4,6 @@ setlocal
 cd /d "%~dp0"
 title yidonghu blog - preview
 
-echo.
-echo   ==========================================
-echo     yidonghu blog  本地预览
-echo     http://127.0.0.1:4321
-echo     (直接读源码，改文件即时刷新)
-echo   ==========================================
-echo.
-
 set "NODE=node"
 where node >nul 2>nul
 if errorlevel 1 (
@@ -25,6 +17,22 @@ if errorlevel 1 (
   )
 )
 
+rem 端口来自 app.config.json 的 local.previewPort，缺失时脚本自己回退 4321
+set "PORT="
+"%NODE%" "scripts\port.mjs" preview > "%TEMP%\yidonghu-port.txt" 2>nul
+if exist "%TEMP%\yidonghu-port.txt" set /p PORT=<"%TEMP%\yidonghu-port.txt"
+del "%TEMP%\yidonghu-port.txt" >nul 2>nul
+if not defined PORT set "PORT=4321"
+set "URL=http://127.0.0.1:%PORT%"
+
+echo.
+echo   ==========================================
+echo     yidonghu blog  本地预览
+echo     %URL%
+echo     (直接读源码，改文件即时刷新)
+echo   ==========================================
+echo.
+
 if not exist "node_modules" (
   echo   [ ] 首次运行，正在安装依赖（约 1 分钟）...
   call npm install --no-audit --no-fund
@@ -35,10 +43,10 @@ if not exist "node_modules" (
   )
 )
 
-powershell -NoProfile -Command "try { $r = Invoke-WebRequest -Uri 'http://127.0.0.1:4321/' -UseBasicParsing -TimeoutSec 3; exit 0 } catch { exit 1 }" >nul 2>nul
+powershell -NoProfile -Command "try { $r = Invoke-WebRequest -Uri '%URL%/' -UseBasicParsing -TimeoutSec 3; exit 0 } catch { exit 1 }" >nul 2>nul
 if not errorlevel 1 (
   echo   [i] 预览服务已在运行，直接打开浏览器
-  start "" "http://127.0.0.1:4321"
+  start "" "%URL%"
   timeout /t 1 >nul
   exit /b 0
 )
@@ -47,9 +55,9 @@ echo   [ ] 正在启动预览，就绪后自动打开浏览器
 echo       关闭本窗口即停止服务
 echo.
 
-start "opener" /min powershell -NoProfile -WindowStyle Hidden -Command "$u='http://127.0.0.1:4321'; $s=Get-Date; while (((Get-Date)-$s).TotalSeconds -lt 40) { try { $r=Invoke-WebRequest -Uri $u -UseBasicParsing -TimeoutSec 1; break } catch { Start-Sleep -Milliseconds 500 } }; Start-Process $u"
+start "opener" /min powershell -NoProfile -WindowStyle Hidden -Command "$u='%URL%'; $s=Get-Date; while (((Get-Date)-$s).TotalSeconds -lt 40) { try { $r=Invoke-WebRequest -Uri $u -UseBasicParsing -TimeoutSec 1; break } catch { Start-Sleep -Milliseconds 500 } }; Start-Process $u"
 
-"%NODE%" "node_modules\astro\astro.js" dev --port 4321 --host 127.0.0.1
+"%NODE%" "node_modules\astro\astro.js" dev --port %PORT% --host 127.0.0.1
 
 echo.
 echo   [ ] 预览已退出

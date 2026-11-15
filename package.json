@@ -7,7 +7,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "admin": "node admin/server.mjs"
+    "admin": "node admin/server.mjs",
+    "check": "node scripts/check.mjs",
+    "port:admin": "node scripts/port.mjs admin",
+    "port:preview": "node scripts/port.mjs preview"
   },
   "dependencies": {
     "astro": "^5.0.0"

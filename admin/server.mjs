@@ -6,7 +6,7 @@
  */
 import { createServer } from 'node:http';
 import { readFile, writeFile, readdir, unlink, stat } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -18,8 +18,19 @@ const ROOT = path.resolve(HERE, '..');
 const POSTS_DIR = path.join(ROOT, 'src', 'data', 'posts');
 const RES_DIR = path.join(ROOT, 'src', 'data', 'resources');
 const SITE_FILE = path.join(ROOT, 'src', 'config', 'site.json');
+const APP_CONFIG_FILE = path.join(ROOT, 'app.config.json');
 const UI_FILE = path.join(HERE, 'ui', 'index.html');
-const PORT = Number(process.env.ADMIN_PORT || 7788);
+
+/** 本地配置（app.config.json）缺失或损坏时不影响启动 */
+function readLocalConfig() {
+  try {
+    return JSON.parse(readFileSync(APP_CONFIG_FILE, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+const APP_CONFIG = readLocalConfig();
+const PORT = Number(process.env.ADMIN_PORT || APP_CONFIG?.local?.adminPort || 7788);
 const HOST = '127.0.0.1';
 
 /* ------------------------------ 工具 ------------------------------ */
@@ -122,7 +133,11 @@ async function readCollection(dir) {
 }
 
 async function git(args) {
-  const { stdout, stderr } = await exec('git', args, { cwd: ROOT, windowsHide: true });
+  // 提交身份优先用 app.config.json 里的 git 段，没配就用仓库自身的 user.name / user.email
+  const pre = [];
+  if (APP_CONFIG?.git?.userName) pre.push('-c', `user.name=${APP_CONFIG.git.userName}`);
+  if (APP_CONFIG?.git?.userEmail) pre.push('-c', `user.email=${APP_CONFIG.git.userEmail}`);
+  const { stdout, stderr } = await exec('git', [...pre, ...args], { cwd: ROOT, windowsHide: true });
   return (stdout || stderr || '').trim();
 }
 
